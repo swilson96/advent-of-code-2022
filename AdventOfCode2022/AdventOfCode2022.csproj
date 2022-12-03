@@ -8,13 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Inputs\Day02.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
+      <EmbeddedResource Include="Inputs\Day02.txt" />
       <None Remove="Inputs\Day01.txt" />
-      <EmbeddedResource Include="Inputs\Day01.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
+      <EmbeddedResource Include="Inputs\Day01.txt" />
+      <None Remove="Inputs\Day03.txt" />
+      <EmbeddedResource Include="Inputs\Day03.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="morelinq" Version="3.3.2" />
     </ItemGroup>
 
 </Project>
