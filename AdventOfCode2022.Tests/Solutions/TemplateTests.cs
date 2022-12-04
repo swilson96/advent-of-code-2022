@@ -20,5 +20,5 @@ public class TemplateTests
         var result = new Template().PartTwo(ExampleInput);
             
         Assert.Equal(0, result);
-}
+    }
 }

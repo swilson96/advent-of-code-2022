@@ -24,6 +24,6 @@ public class Day04Tests
     {
         var result = new Day04().PartTwo(ExampleInput);
             
-        Assert.Equal(0, result);
-}
+        Assert.Equal(4, result);
+    }
 }

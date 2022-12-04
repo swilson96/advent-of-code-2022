@@ -1,6 +1,3 @@
-using System.Transactions;
-using MoreLinq;
-
 namespace AdventOfCode2022.Solutions;
 
 public class Day04 : IAdventSolution
@@ -17,15 +14,22 @@ public class Day04 : IAdventSolution
         return area1.Contains(area2) || area2.Contains(area1);
     }
 
-    public int PartTwo(string input)
+    public int PartTwo(string input) => input.Split(Environment.NewLine)
+        .Select(s => s.Split(","))
+        .Where(RangesOverlap)
+        .Count();
+    
+    private bool RangesOverlap(string[] arg)
     {
-        return 0;
+        var area1 = new CampArea(arg[0]);
+        var area2 = new CampArea(arg[1]);
+        return area1.Overlaps(area2);
     }
 
     private class CampArea
     {
-        private int Start { get; set; }
-        private int End { get; set; }
+        private int Start { get; }
+        private int End { get; }
         
         public CampArea(string serialised)
         {
@@ -37,6 +41,12 @@ public class Day04 : IAdventSolution
         public bool Contains(CampArea other)
         {
             return Start <= other.Start && other.End <= End;
+        }
+
+        public bool Overlaps(CampArea other)
+        {
+            return (other.Start <= Start && Start <= other.End)
+                || (Start <= other.Start && other.Start <= End);
         }
     }
 }
