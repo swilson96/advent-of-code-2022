@@ -18,7 +18,7 @@ public class TemplateTests
     public void PartTwoExample()
     {
         var result = new Template().PartTwo(ExampleInput);
-            
+        
         Assert.Equal(0, result);
     }
 }

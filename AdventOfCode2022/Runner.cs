@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Diagnostics;
 using System.Reflection;
 using AdventOfCode2022.Advent;
 using AdventOfCode2022.Solutions;
@@ -87,8 +88,16 @@ void SolveForDay(int day)
     }
 
     var solver = (IAdventSolution)solverObject;
+    
+    var watch = new Stopwatch();
+    watch.Start();
     var part1 = solver.PartOne(input);
-    Console.WriteLine("Day {0} Part 1: {1}", dayToRunString, part1);
+    watch.Stop();
+    Console.WriteLine("Day {0} Part 1: {1} (in {2}ms)", dayToRunString, part1, watch.ElapsedMilliseconds);
+    
+    watch.Reset();
+    watch.Start();
     var part2 = solver.PartTwo(input);
-    Console.WriteLine("Day {0} Part 2: {1}", dayToRunString, part2);
+    watch.Stop();
+    Console.WriteLine("Day {0} Part 2: {1} (in {2}ms)", dayToRunString, part2, watch.ElapsedMilliseconds);
 }
