@@ -2,7 +2,7 @@ namespace AdventOfCode2022.Solutions;
 
 public class Day01 : IAdventSolution
 {
-    public int PartOne(string input)
+    public object PartOne(string input)
     {
         return ParseElfCalorieTotals(input)
             .Max();
@@ -21,7 +21,7 @@ public class Day01 : IAdventSolution
             .Sum();
     }
 
-    public int PartTwo(string input)
+    public object PartTwo(string input)
     {
         return ParseElfCalorieTotals(input)
             .OrderDescending()

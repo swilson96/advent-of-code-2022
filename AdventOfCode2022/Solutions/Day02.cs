@@ -2,7 +2,7 @@ namespace AdventOfCode2022.Solutions;
 
 public class Day02 : IAdventSolution
 {
-    public int PartOne(string input) => input.Split(Environment.NewLine)
+    public object PartOne(string input) => input.Split(Environment.NewLine)
         .Select(ScoreRound)
         .Sum();
 
@@ -20,7 +20,7 @@ public class Day02 : IAdventSolution
         _ => 0
     };
 
-    public int PartTwo(string input) => input.Split(Environment.NewLine)
+    public object PartTwo(string input) => input.Split(Environment.NewLine)
         .Select(ScoreRoundFromResult)
         .Sum();
 

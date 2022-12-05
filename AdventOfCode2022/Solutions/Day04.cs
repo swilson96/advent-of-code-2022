@@ -2,7 +2,7 @@ namespace AdventOfCode2022.Solutions;
 
 public class Day04 : IAdventSolution
 {
-    public int PartOne(string input) => input.Split(Environment.NewLine)
+    public object PartOne(string input) => input.Split(Environment.NewLine)
         .Select(s => s.Split(","))
         .Where(OneRangeCompletelyContainsAnother)
         .Count();
@@ -14,7 +14,7 @@ public class Day04 : IAdventSolution
         return area1.Contains(area2) || area2.Contains(area1);
     }
 
-    public int PartTwo(string input) => input.Split(Environment.NewLine)
+    public object PartTwo(string input) => input.Split(Environment.NewLine)
         .Select(s => s.Split(","))
         .Where(RangesOverlap)
         .Count();

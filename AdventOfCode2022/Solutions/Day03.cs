@@ -6,7 +6,7 @@ public class Day03 : IAdventSolution
 {
     private const int GroupSize = 3;
     
-    public int PartOne(string input) => input.Split(Environment.NewLine)
+    public object PartOne(string input) => input.Split(Environment.NewLine)
         .Select(IdentifyMispackedItemInPack)
         .Select(PrioritiseItem)
         .Sum();
@@ -27,7 +27,7 @@ public class Day03 : IAdventSolution
             : encoding - 64 + 26; // uppercase start at 65
     }
 
-    public int PartTwo(string input) => input.Split(Environment.NewLine)
+    public object PartTwo(string input) => input.Split(Environment.NewLine)
         .Batch(GroupSize)
         .Select(IdentifyBadgeInGroup)
         .Select(PrioritiseItem)

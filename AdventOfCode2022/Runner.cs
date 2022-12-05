@@ -20,19 +20,23 @@ if (advent.IsAdventNow()) {
     }
 }
 
+var dayToRun = 0;
 try
 {
-    var dayToRun = DayToRun();
-    SolveForDay(dayToRun);
+    dayToRun = DayToRun();
 }
 catch (ArgumentException e)
 {
     Console.Error.WriteLine("Invalid arguments: {0}", e.Message);
+    return;
 }
 catch (FormatException e)
 {
     Console.Error.WriteLine("Error parsing the requested day: {0}", e.Message);
+    return;
 }
+
+SolveForDay(dayToRun);
 
 
 int DayToRun()
