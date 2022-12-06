@@ -48,14 +48,14 @@ public class Day05 : IAdventSolution
         public void ExecuteMove(string move)
         {
             var match = _moveRegex.Match(move);
-            var leftToMove = int.Parse(match.Groups[1].Value);
+            var toMove = int.Parse(match.Groups[1].Value);
             var from = match.Groups[2].Value[0];
             var to = match.Groups[3].Value[0];
 
             var stackFrom = _stacks[from];
             var stackTo = _stacks[to];
 
-            _crane.Move(_stacks, leftToMove, stackFrom, stackTo);
+            _crane.Move(toMove, stackFrom, stackTo);
         }
 
         public string TopsOfStacks => string.Join("", _stacks.Values.Select(s => s.Peek()));
@@ -63,12 +63,12 @@ public class Day05 : IAdventSolution
 
     private interface ICrane
     {
-        void Move(Dictionary<char, Stack<char>> stacks, int leftToMove, Stack<char> stackFrom, Stack<char> stackTo);
+        void Move(int toMove, Stack<char> stackFrom, Stack<char> stackTo);
     }
 
     private class PartsMover9000 : ICrane
     {
-        public void Move(Dictionary<char, Stack<char>> stacks, int leftToMove, Stack<char> stackFrom, Stack<char> stackTo)
+        public void Move(int leftToMove, Stack<char> stackFrom, Stack<char> stackTo)
         {
             while (leftToMove > 0)
             {
@@ -80,7 +80,7 @@ public class Day05 : IAdventSolution
     
     private class PartsMover9001 : ICrane
     {
-        public void Move(Dictionary<char, Stack<char>> stacks, int leftToMove, Stack<char> stackFrom, Stack<char> stackTo)
+        public void Move(int leftToMove, Stack<char> stackFrom, Stack<char> stackTo)
         {
             var crates = new Stack<char>();
             while (leftToMove > 0)
