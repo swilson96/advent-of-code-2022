@@ -7,17 +7,17 @@ public class Day05 : IAdventSolution
 {
     public object PartOne(string input)
     {
-        var parts = input.Split(Environment.NewLine + Environment.NewLine);
-        var ship = new Ship(parts[0], new PartsMover9000());
-        parts[1].Split(Environment.NewLine).ForEach(ship.ExecuteMove);
+        var inputBits = input.Split(Environment.NewLine + Environment.NewLine);
+        var ship = new Ship(inputBits[0], new PartsMover9000());
+        inputBits[1].Split(Environment.NewLine).ForEach(ship.ExecuteMove);
         return ship.TopsOfStacks;
     }
 
     public object PartTwo(string input)
     {
-        var parts = input.Split(Environment.NewLine + Environment.NewLine);
-        var ship = new Ship(parts[0], new PartsMover9001()); // Upgrade!
-        parts[1].Split(Environment.NewLine).ForEach(ship.ExecuteMove);
+        var inputBits = input.Split(Environment.NewLine + Environment.NewLine);
+        var ship = new Ship(inputBits[0], new PartsMover9001()); // Upgrade!
+        inputBits[1].Split(Environment.NewLine).ForEach(ship.ExecuteMove);
         return ship.TopsOfStacks;
     }
 
