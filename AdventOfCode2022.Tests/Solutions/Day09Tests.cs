@@ -27,6 +27,21 @@ R 2";
     {
         var result = new Day09().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(1, result);
+    }
+    
+    [Fact]
+    public void PartTwoSecondExample()
+    {
+        var result = new Day09().PartTwo(@"R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20");
+        
+        Assert.Equal(36, result);
     }
 }

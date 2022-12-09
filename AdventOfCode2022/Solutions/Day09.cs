@@ -7,6 +7,11 @@ public class Day09 : IAdventSolution
     public object PartOne(string input)
     {
         var rope = new Rope();
+        return CountTailVisits(rope, input);
+    }
+
+    private int CountTailVisits(Rope rope, string input)
+    {
         var visited = new HashSet<Point> { rope.TailPosition };
         
         foreach (var s in input.Split(Environment.NewLine).Select(l => l.Split(" ")))
@@ -15,7 +20,7 @@ public class Day09 : IAdventSolution
             var distance = int.Parse(s[1]);
             while (distance > 0)
             {
-                rope.MoveHead(direction);
+                rope.MoveHeadTo(rope.HeadPosition.Add(direction, 1));
                 visited.Add(rope.TailPosition);
                 --distance;
             }
@@ -24,40 +29,84 @@ public class Day09 : IAdventSolution
         return visited.Count();
     }
 
-    public object PartTwo(string input) => 0;
+    public object PartTwo(string input)
+    {
+        var rope = new Rope(
+            new Rope(
+                new Rope(
+                    new Rope(
+                        new Rope(
+                            new Rope(
+                                new Rope(
+                                    new Rope(
+                                        new Rope()))))))));
+        return CountTailVisits(rope, input);
+    }
 
     private class Rope
     {
         private Point _headPosition = Point.Origin;
         private Point _tailOffset = Point.Origin;
-        
-        public void MoveHead(Direction direction)
+
+        private readonly Rope? _tail;
+
+        public Rope()
         {
-            _headPosition = _headPosition.Add(direction, 1);
-            _tailOffset = _tailOffset.Add(direction.Opposite(), 1);
+        }
+        
+        public Rope(Rope tail)
+        {
+            _tail = tail;
+        }
+        
+        public void MoveHeadTo(Point newHead)
+        {
+            var move = newHead.Subtract(_headPosition);
+            _headPosition = newHead;
 
-            var newOffsetY = direction switch
+            _tailOffset = _tailOffset.Subtract(move);
+            
+            var newOffsetX = _tailOffset.X;
+            var newOffsetY = _tailOffset.Y;
+
+            if (Math.Abs(_tailOffset.X) == 2 && Math.Abs(_tailOffset.Y) == 2)
             {
-                Direction.U => int.Max(-1, _tailOffset.Y),
-                Direction.R => _tailOffset.X < -1 ? 0 : _tailOffset.Y,
-                Direction.D => int.Min(1, _tailOffset.Y),
-                Direction.L => _tailOffset.X > 1 ? 0 : _tailOffset.Y,
-                _ => throw new ArgumentOutOfRangeException($"No known direction {direction}")
-            };
-
-            var newOffsetX = direction switch
+                // Diagonal
+                newOffsetX = _tailOffset.X / 2;
+                newOffsetY = _tailOffset.Y / 2;
+            }
+            else if (_tailOffset.Y > 1)
             {
-                Direction.U => _tailOffset.Y < -1 ? 0 : _tailOffset.X,
-                Direction.R => int.Max(-1, _tailOffset.X),
-                Direction.D => _tailOffset.Y > 1 ? 0 : _tailOffset.X,
-                Direction.L => int.Min(1, _tailOffset.X),
-                _ => throw new ArgumentOutOfRangeException($"No known direction {direction}")
-            };
-
+                // Up
+                newOffsetX = 0;
+                newOffsetY = 1;
+            }
+            else if (_tailOffset.Y < -1)
+            {
+                // Down
+                newOffsetX = 0;
+                newOffsetY = -1;
+            }
+            else if (_tailOffset.X > 1)
+            {
+                // Right
+                newOffsetX = 1;
+                newOffsetY = 0;
+            } 
+            else if (_tailOffset.X < -1)
+            {
+                // Left
+                newOffsetX = -1;
+                newOffsetY = 0;
+            }
+            
             _tailOffset = new Point(newOffsetX, newOffsetY);
+            
+            _tail?.MoveHeadTo(_headPosition.Add(_tailOffset));
         }
 
-        public Point TailPosition => _headPosition.Add(_tailOffset);
-    }
+        public Point HeadPosition => _headPosition;
 
+        public Point TailPosition => _tail != null ? _tail.TailPosition : _headPosition.Add(_tailOffset);
+    }
 }
