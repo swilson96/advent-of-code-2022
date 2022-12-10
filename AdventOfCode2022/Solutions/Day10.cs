@@ -32,5 +32,38 @@ public class Day10 : IAdventSolution
 
     private bool CycleIsInteresting(int cycle) => (cycle + 20) % 40 == 0;
 
-    public object PartTwo(string input) => 0;
+    public object PartTwo(string input)
+    {
+        var screen = new [] { new char[40], new char[40], new char[40], new char[40], new char[40], new char[40] };
+        
+        var row = 0;
+        var position = 0;
+        var register = 1;
+        foreach (var instruction in input.Split(Environment.NewLine))
+        {
+            screen[row][position] = Math.Abs(position - register) <= 1 ? '#' : '.';
+            
+            if (instruction.StartsWith("addx"))
+            {
+                ++position;
+                if (position >= 40)
+                {
+                    position = 0;
+                    ++row;
+                }
+                    
+                screen[row][position] = Math.Abs(position - register) <= 1 ? '#' : '.';
+                register += int.Parse(instruction[5..]);
+            }
+            
+            ++position;
+            if (position >= 40)
+            {
+                position = 0;
+                ++row;
+            }
+        }
+
+        return string.Join(Environment.NewLine, screen.Select(r => string.Join("", r)));
+    }
 }
