@@ -37,7 +37,7 @@ Monkey 3:
     {
         var result = new Day11().PartOne(ExampleInput);
         
-        Assert.Equal(10605, result);
+        Assert.Equal(10605L, result);
     }
 
     [Fact]
@@ -45,6 +45,6 @@ Monkey 3:
     {
         var result = new Day11().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(2713310158L, result);
     }
 }

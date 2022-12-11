@@ -2,19 +2,21 @@ namespace AdventOfCode2022.Solutions;
 
 public class Day11 : IAdventSolution
 {
-    public object PartOne(string input)
+    public object PartOne(string input) => MonkeyBusinessAfterThisManyRounds(input, 20, x => x / 3);
+    
+    private long MonkeyBusinessAfterThisManyRounds(string input, long rounds, Func<long, long> worryStrategy)
     {
-        var monkeys = input.Split(Environment.NewLine + Environment.NewLine).Select(ParseMonkey).ToList();
+        var monkeys = input.Split(Environment.NewLine + Environment.NewLine).Select(m => ParseMonkey(m, worryStrategy)).ToList();
 
         var round = 0;
-        while (round < 20)
+        while (round < rounds)
         {
             foreach (var monkey in monkeys)
             {
                 while (monkey.HasNextItem())
                 {
                     var nextItemThrow = monkey.NextItemThrow();
-                    monkeys[nextItemThrow[0]].CatchItem(nextItemThrow[1]);
+                    monkeys[nextItemThrow.Recipient].CatchItem(nextItemThrow.Value);
                 }
             }
             ++round;
@@ -24,19 +26,19 @@ public class Day11 : IAdventSolution
         return mostInspected[0] * mostInspected[1];
     }
 
-    private Monkey ParseMonkey(string input)
+    private Monkey ParseMonkey(string input, Func<long, long> worryLevelStrategy)
     {
         var lines = input.Split(Environment.NewLine).ToList();
-        var items = lines[1][18..].Split(", ").Select(int.Parse);
+        var items = lines[1][18..].Split(", ").Select(long.Parse);
         var operation = ParseOperationLine(lines[2]);
-        var testDivisibleBy = int.Parse(lines[3][21..]);
+        var testDivisibleBy = long.Parse(lines[3][21..]);
         var nextPositive = int.Parse(lines[4][29..]);
         var nextNegative = int.Parse(lines[5][30..]);
 
-        return new Monkey(items, operation, testDivisibleBy, nextPositive, nextNegative);
+        return new Monkey(items, operation, testDivisibleBy, nextPositive, nextNegative, worryLevelStrategy);
     }
 
-    private Func<int, int> ParseOperationLine(string line)
+    private Func<long, long> ParseOperationLine(string line)
     {
         var subject = line[25..];
         if (subject == "old")
@@ -48,7 +50,7 @@ public class Day11 : IAdventSolution
                 _ => throw new ArgumentException($"unexpected operation symbol {line[23]}")
             };
         }
-        var value = int.Parse(subject);
+        var value = long.Parse(subject);
         return line[23] switch
         {
             '+' => x => x + value,
@@ -57,35 +59,50 @@ public class Day11 : IAdventSolution
         };
     }
 
-    public object PartTwo(string input) => 0;
+    public object PartTwo(string input) => MonkeyBusinessAfterThisManyRounds(input, 10000, x => x);
 
     private class Monkey
     {
-        private readonly Queue<int> _itemQueue;
-        private readonly Func<int, int> _operation;
-        private readonly Func<int, int> _throwTo;
-        public Monkey(IEnumerable<int> items, Func<int, int> operation, int testDivisibleBy, int nextPositive, int nextNegative)
+        private readonly Queue<long> _itemQueue;
+        private readonly Func<long, long> _operation;
+        private readonly Func<long, int> _throwTo;
+        private readonly Func<long, long> _worryLevelStrategy;
+
+        public Monkey(IEnumerable<long> items, Func<long, long> operation, long testDivisibleBy, int nextPositive,
+            int nextNegative, Func<long, long> worryLevelStrategy)
         {
-            _itemQueue = new Queue<int>(items);
+            _itemQueue = new Queue<long>(items);
             _operation = operation;
             _throwTo = x => (x % testDivisibleBy) == 0 ? nextPositive : nextNegative;
+            _worryLevelStrategy = worryLevelStrategy;
         }
 
-        public void CatchItem(int item) => _itemQueue.Enqueue(item);
+        public void CatchItem(long item) => _itemQueue.Enqueue(item);
 
         public bool HasNextItem() => _itemQueue.Count > 0;
         
         // id, value
-        public int[] NextItemThrow()
+        public MonkeyThrow NextItemThrow()
         {
             ++InspectedCount;
             var value = _itemQueue.Dequeue();
             var afterInspection = _operation(value);
-            var beforeThrow = afterInspection / 3;
+            var beforeThrow = _worryLevelStrategy(afterInspection);
             var throwTo = _throwTo(beforeThrow);
-            return new [] { throwTo, beforeThrow };
+            return new MonkeyThrow(throwTo, beforeThrow);
         }
         
-        public int InspectedCount { get; private set; }
+        public long InspectedCount { get; private set; }
+    }
+
+    public class MonkeyThrow
+    {
+        public int Recipient { get; }
+        public long Value { get; }
+        public MonkeyThrow(int recipient, long value)
+        {
+            Recipient = recipient;
+            Value = value;
+        }
     }
 }
