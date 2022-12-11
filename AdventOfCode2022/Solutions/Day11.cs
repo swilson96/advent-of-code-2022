@@ -59,7 +59,12 @@ public class Day11 : IAdventSolution
         };
     }
 
-    public object PartTwo(string input) => MonkeyBusinessAfterThisManyRounds(input, 10000, x => x);
+    public object PartTwo(string input)
+    {
+        var monkeys = input.Split(Environment.NewLine + Environment.NewLine).Select(m => ParseMonkey(m, x => x)).ToList();
+        var multiple = monkeys.Select(m => m.TestDivisor).Aggregate(1L, (acc, x) => acc * x);
+        return MonkeyBusinessAfterThisManyRounds(input, 10000, x => x % multiple);
+    }
 
     private class Monkey
     {
@@ -67,6 +72,8 @@ public class Day11 : IAdventSolution
         private readonly Func<long, long> _operation;
         private readonly Func<long, int> _throwTo;
         private readonly Func<long, long> _worryLevelStrategy;
+        
+        public long TestDivisor { get; }
 
         public Monkey(IEnumerable<long> items, Func<long, long> operation, long testDivisibleBy, int nextPositive,
             int nextNegative, Func<long, long> worryLevelStrategy)
@@ -75,6 +82,7 @@ public class Day11 : IAdventSolution
             _operation = operation;
             _throwTo = x => (x % testDivisibleBy) == 0 ? nextPositive : nextNegative;
             _worryLevelStrategy = worryLevelStrategy;
+            TestDivisor = testDivisibleBy;
         }
 
         public void CatchItem(long item) => _itemQueue.Enqueue(item);
@@ -91,11 +99,10 @@ public class Day11 : IAdventSolution
             var throwTo = _throwTo(beforeThrow);
             return new MonkeyThrow(throwTo, beforeThrow);
         }
-        
         public long InspectedCount { get; private set; }
     }
 
-    public class MonkeyThrow
+    private class MonkeyThrow
     {
         public int Recipient { get; }
         public long Value { get; }
