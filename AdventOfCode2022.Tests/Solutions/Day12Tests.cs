@@ -23,6 +23,6 @@ abdefghi";
     {
         var result = new Day12().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(29, result);
     }
 }
