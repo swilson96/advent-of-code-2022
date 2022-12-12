@@ -89,7 +89,6 @@ public class Day11 : IAdventSolution
 
         public bool HasNextItem() => _itemQueue.Count > 0;
         
-        // id, value
         public MonkeyThrow NextItemThrow()
         {
             ++InspectedCount;

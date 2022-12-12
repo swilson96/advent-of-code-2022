@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace AdventOfCode2022.Solutions.Cartesian;
 
 public class Point
@@ -6,6 +8,8 @@ public class Point
     
     public int X { get; }
     public int Y { get; }
+
+    public IEnumerable<Point> Neighbours => Enum.GetValues<Direction>().Select(d => this.Add(d, 1));
 
     public Point(int x, int y)
     {
