@@ -18,6 +18,7 @@
       <EmbeddedResource Include="Inputs\Day10.txt" />
       <EmbeddedResource Include="Inputs\Day11.txt" />
       <EmbeddedResource Include="Inputs\Day12.txt" />
+      <EmbeddedResource Include="Inputs\Day13.txt" />
       <None Remove="Inputs\Day01.txt" />
       <EmbeddedResource Include="Inputs\Day01.txt" />
       <None Remove="Inputs\Day03.txt" />
@@ -26,6 +27,7 @@
 
     <ItemGroup>
       <PackageReference Include="morelinq" Version="3.3.2" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     </ItemGroup>
 
 </Project>
