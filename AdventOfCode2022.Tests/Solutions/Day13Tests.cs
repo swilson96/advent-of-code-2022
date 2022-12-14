@@ -109,6 +109,6 @@ public class Day13Tests
     {
         var result = new Day13().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(140, result);
     }
 }

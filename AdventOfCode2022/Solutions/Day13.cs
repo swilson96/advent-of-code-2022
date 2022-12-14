@@ -85,7 +85,6 @@ public class Day13 : IAdventSolution
                     {
                         current.Add(next);
                     }
-
                     break;
                 case ']':
                     --level;
