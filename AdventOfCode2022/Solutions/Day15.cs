@@ -17,10 +17,29 @@ public class Day15 : IAdventSolution
         var xMax = sensors.Select(t => t.Item1.X + t.Item3).Max();
 
         var beaconsInLine = sensors.Select(s => s.Item2).Distinct().Count(b => b.Y == rowToCheck);
-        
-        return Enumerable.Range(xMin, xMax - xMin + 1)
-            .Select(x => new Point(x, rowToCheck))
-            .Count(p => sensors.Any(s => Point.ManhattanDistance(s.Item1, p) <= s.Item3)) - beaconsInLine;
+
+        var x = xMin;
+        var pointsInSomeSensorRange = 0;
+        while (x <= xMax)
+        {
+            var sensorData = sensors.FirstOrDefault(s => QuickCheckWithinRange(s.Item1, x, rowToCheck, s.Item3));
+            if (sensorData == null)
+            {
+                ++x;
+                continue;
+            }
+            
+            var sensor = sensorData.Item1;
+            var range = sensorData.Item3;
+
+            while (QuickCheckWithinRange(sensor, x, rowToCheck, range))
+            {
+                ++pointsInSomeSensorRange;
+                ++x;
+            }
+        }
+
+        return pointsInSomeSensorRange - beaconsInLine;
     }
 
     private List<Tuple<Point, Point, int>> ParseSensors(string input) => input.Split(Environment.NewLine)
