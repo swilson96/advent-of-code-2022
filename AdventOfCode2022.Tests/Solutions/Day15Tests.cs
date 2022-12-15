@@ -30,8 +30,8 @@ Sensor at x=20, y=1: closest beacon is at x=15, y=3";
     [Fact]
     public void PartTwoExample()
     {
-        var result = new Day15().PartTwo(ExampleInput);
+        var result = new Day15().TuningFrequencyInSearchSpace(ExampleInput, 20);
         
-        Assert.Equal(0, result);
+        Assert.Equal(56000011, result);
     }
 }

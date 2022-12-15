@@ -11,18 +11,7 @@ public class Day15 : IAdventSolution
     
     public int PotentialBeaconsInRow(string input, int rowToCheck)
     {
-        var sensors = input.Split(Environment.NewLine)
-            .Select(l => _inputRegex.Match(l))
-            .Select(m =>
-            {
-                var location = new Point(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value));
-                var beacon = new Point(int.Parse(m.Groups[3].Value), int.Parse(m.Groups[4].Value));
-                return new Tuple<Point, Point, int>(
-                    location,
-                    beacon,
-                    Point.ManhattanDistance(location, beacon)
-                );
-            }).ToList();
+        var sensors = ParseSensors(input);
         
         var xMin = sensors.Select(t => t.Item1.X - t.Item3).Min();
         var xMax = sensors.Select(t => t.Item1.X + t.Item3).Max();
@@ -34,5 +23,47 @@ public class Day15 : IAdventSolution
             .Count(p => sensors.Any(s => Point.ManhattanDistance(s.Item1, p) <= s.Item3)) - beaconsInLine;
     }
 
-    public object PartTwo(string input) => 0;
+    private List<Tuple<Point, Point, int>> ParseSensors(string input) => input.Split(Environment.NewLine)
+        .Select(l => _inputRegex.Match(l))
+        .Select(m =>
+        {
+            var location = new Point(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value));
+            var beacon = new Point(int.Parse(m.Groups[3].Value), int.Parse(m.Groups[4].Value));
+            return new Tuple<Point, Point, int>(
+                location,
+                beacon,
+                Point.ManhattanDistance(location, beacon)
+            );
+        }).ToList();
+
+    private bool QuickCheckWithinRange(Point sensor, int x, int y, int distance) =>
+        Math.Abs(sensor.X - x) + Math.Abs(sensor.Y - y) <= distance;
+
+    public object PartTwo(string input) => TuningFrequencyInSearchSpace(input, 4000000);
+
+    public long TuningFrequencyInSearchSpace(string input, int width)
+    {
+        var sensors = ParseSensors(input);
+
+        // Iterating the space is way too much so check round the edge of each sensor range
+        foreach (var (sensor, _, range) in sensors)
+        {
+            Console.WriteLine($"checking edge of sensor {sensor} with range {range}");
+
+            for (var y = Math.Max(0, sensor.Y - range - 1); y <= width && y <= sensor.Y + range + 1; ++y)
+            {
+                var xDistance = range - Math.Abs(sensor.Y - y) + 1; // just outside range
+                if (sensor.X - xDistance >= 0 && !sensors.Any(s => QuickCheckWithinRange(s.Item1, sensor.X - xDistance, y, s.Item3)))
+                {
+                    return 1L * (sensor.X - xDistance) * 4000000 + y;
+                }
+                if (sensor.X - xDistance <= width && !sensors.Any(s => QuickCheckWithinRange(s.Item1, sensor.X + xDistance, y, s.Item3)))
+                {
+                    return 1L * (sensor.X + xDistance) * 4000000 + y;
+                }
+            }
+        }
+
+        return -1;
+    }
 }
