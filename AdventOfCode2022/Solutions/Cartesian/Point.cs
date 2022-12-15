@@ -37,4 +37,9 @@ public class Point
     public override int GetHashCode() => HashCode.Combine(X, Y);
 
     public override string ToString() => $"Point({X}, {Y})";
+
+    public static int ManhattanDistance(Point a, Point b)
+    {
+        return Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
+    }
 }

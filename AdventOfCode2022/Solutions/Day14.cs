@@ -5,6 +5,7 @@ namespace AdventOfCode2022.Solutions;
 public class Day14 : IAdventSolution
 {
     private const int Width = 1001;
+    
     public object PartOne(string input)
     {
         var lines = ParseRockPaths(input);
