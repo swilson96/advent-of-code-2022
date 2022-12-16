@@ -36,6 +36,11 @@ public class Day16 : IAdventSolution
             }
 
             current.IsOn = false;
+            
+            if (current.Flow > 3) // Randomly guessed this cutoff
+            {
+                return best;
+            }
         }
 
         return current.Neighbours
