@@ -38,6 +38,6 @@ Valve CC has flow rate=2; tunnels lead to valves BB, AA");
     {
         var result = new Day16().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(1707, result);
     }
 }
