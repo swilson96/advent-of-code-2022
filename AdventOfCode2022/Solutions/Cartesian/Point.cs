@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace AdventOfCode2022.Solutions.Cartesian;
 
 public class Point
@@ -38,8 +36,5 @@ public class Point
 
     public override string ToString() => $"Point({X}, {Y})";
 
-    public static int ManhattanDistance(Point a, Point b)
-    {
-        return Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
-    }
+    public static int ManhattanDistance(Point a, Point b) => Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
 }

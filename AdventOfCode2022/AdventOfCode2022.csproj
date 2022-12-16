@@ -21,6 +21,7 @@
       <EmbeddedResource Include="Inputs\Day13.txt" />
       <EmbeddedResource Include="Inputs\Day14.txt" />
       <EmbeddedResource Include="Inputs\Day15.txt" />
+      <EmbeddedResource Include="Inputs\Day16.txt" />
       <None Remove="Inputs\Day01.txt" />
       <EmbeddedResource Include="Inputs\Day01.txt" />
       <None Remove="Inputs\Day03.txt" />
