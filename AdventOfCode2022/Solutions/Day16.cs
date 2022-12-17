@@ -95,7 +95,7 @@ public class Day16 : IAdventSolution
             
             // elephant moves instead of switching
             bestProtagonistSwitches = eCurrent.Neighbours
-                .Where(eNeighbour => eNeighbour != ePrev)
+                .Where(neighbour => neighbour != pPrev && neighbour != ePrev)
                 .Select(eNeighbour => TopScoreWithElephant(protagonistStart, valves[eNeighbour].Name, null, elephantStart, valves, timeRemaining - 1))
                 .Prepend(0)
                 .Max() + (timeRemaining - 1) * pCurrent.Flow;
@@ -116,7 +116,7 @@ public class Day16 : IAdventSolution
                 return (timeRemaining - 1) * eCurrent.Flow;
             }
             bestElephantSwitches = pCurrent.Neighbours
-                .Where(neighbour => neighbour != pPrev)
+                .Where(neighbour => neighbour != pPrev && neighbour != ePrev)
                 .Select(neighbour => TopScoreWithElephant(valves[neighbour].Name, elephantStart, protagonistStart, null, valves, timeRemaining - 1))
                 .Prepend(0)
                 .Max() + (timeRemaining - 1) * eCurrent.Flow;
@@ -129,9 +129,10 @@ public class Day16 : IAdventSolution
         }
 
         return pCurrent.Neighbours
-            .Where(neighbour => neighbour != pPrev)
+            .Where(neighbour => neighbour != pPrev && neighbour != ePrev)
             .SelectMany(neighbour => eCurrent.Neighbours
                 .Where(eNeighbour => eNeighbour != ePrev)
+                .Where(eNeighbour => elephantStart != protagonistStart || string.Compare(eNeighbour, neighbour, StringComparison.Ordinal) > 0) // diagonal
                 .Select(eNeighbour => TopScoreWithElephant(valves[neighbour].Name, valves[eNeighbour].Name, protagonistStart, elephantStart, valves, timeRemaining - 1)))
             .Prepend(bestBothSwitch)
             .Prepend(bestProtagonistSwitches)
