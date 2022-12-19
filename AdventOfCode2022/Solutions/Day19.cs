@@ -6,18 +6,18 @@ public class Day19 : IAdventSolution
 {
     public object PartOne(string input) => input.Split(Environment.NewLine)
         .Select(Blueprint.Parse)
-        .Select(ScoreBlueprint)
+        .Select(b => ScoreBlueprint(b, 24))
         .Select((s, i) => s * (i + 1))
         .Sum();
 
-    private int ScoreBlueprint(Blueprint blueprint)
+    public int ScoreBlueprint(Blueprint blueprint, int minutes)
     {
         var robots = Enum.GetValues<Material>().ToDictionary(v => v, _ => 0);
         robots[Material.Ore] = 1;
         var materials = Enum.GetValues<Material>().ToDictionary(v => v, _ => 0);
 
-        return Math.Max(ScoreBlueprint(blueprint, robots, materials, Material.Ore, 24),
-            ScoreBlueprint(blueprint, robots, materials, Material.Clay, 24));
+        return Math.Max(ScoreBlueprint(blueprint, robots, materials, Material.Ore, minutes),
+            ScoreBlueprint(blueprint, robots, materials, Material.Clay, minutes));
     }
 
     private int ScoreBlueprint(Blueprint blueprint, Dictionary<Material, int> robots, Dictionary<Material, int> materials, Material nextToBuild, int timeLeft)
@@ -42,14 +42,18 @@ public class Day19 : IAdventSolution
         return geodesThisMinute + ScoreBlueprint(blueprint, robots, nextMaterials, nextToBuild, timeLeft - 1);
     }
     
-    public object PartTwo(string input) => 0;
+    public object PartTwo(string input) => input.Split(Environment.NewLine)
+        .Take(3)
+        .Select(Blueprint.Parse)
+        .Select(b => ScoreBlueprint(b, 32))
+        .Aggregate(1, (acc, next) => acc * next);
 
-    private enum Material
+    public enum Material
     {
         Ore, Clay, Obsidian, Geode
     }
     
-    private class Blueprint
+    public class Blueprint
     {
         private static readonly Regex InputRegex =
             new(
