@@ -15,7 +15,7 @@ public class Day19 : IAdventSolution
         var robots = Enum.GetValues<Material>().ToDictionary(v => v, _ => 0);
         robots[Material.Ore] = 1;
         var materials = Enum.GetValues<Material>().ToDictionary(v => v, _ => 0);
-
+        
         return Math.Max(ScoreBlueprint(blueprint, robots, materials, Material.Ore, minutes),
             ScoreBlueprint(blueprint, robots, materials, Material.Clay, minutes));
     }
@@ -30,6 +30,14 @@ public class Day19 : IAdventSolution
         }
         
         var nextMaterials = materials.ToDictionary(e => e.Key, e => e.Value + robots[e.Key]);
+        if (blueprint.CanBuildWith(Material.Geode, materials))
+        {
+            ++robots[Material.Geode];
+            nextMaterials = blueprint.SubtractCost(Material.Geode, nextMaterials);
+            var score = geodesThisMinute + ScoreBlueprint(blueprint, robots, nextMaterials, nextToBuild, timeLeft - 1);
+            --robots[Material.Geode];
+            return score;
+        }
         if (blueprint.CanBuildWith(nextToBuild, materials))
         {
             ++robots[nextToBuild];
@@ -74,8 +82,6 @@ public class Day19 : IAdventSolution
             _maxOreCost = new List<int> { oreCost, clayCost, obsCostOre, geoCostOre }.Max();
         }
 
-        private int Cost(Material toBuild, Material toSpend) => _costs[toBuild][toSpend];
-
         public bool CanBuildWith(Material toBuild, Dictionary<Material, int> materials)
         {
             var costs = _costs[toBuild];
@@ -99,15 +105,10 @@ public class Day19 : IAdventSolution
             {
                 yield return Material.Clay;
             }
-
+            
             if (robots[Material.Clay] > 0 && robots[Material.Obsidian] < _costs[Material.Geode][Material.Obsidian])
             {
                 yield return Material.Obsidian;
-            }
-
-            if (robots[Material.Obsidian] > 0)
-            {
-                yield return Material.Geode;
             }
         }
 
