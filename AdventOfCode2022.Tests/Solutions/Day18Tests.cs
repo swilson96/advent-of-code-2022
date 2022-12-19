@@ -31,6 +31,6 @@ public class Day18Tests
     {
         var result = new Day18().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(58, result);
     }
 }
