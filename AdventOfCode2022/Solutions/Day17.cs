@@ -11,13 +11,21 @@ public class Day17 : IAdventSolution
     public long RockTower(string jets, long totalRocks)
     {
         var jetLength = jets.Length;
-        var jetIndex = 0L;
+        var jetIndex = 0;
         var loopedHeight = 0L;
         
         using var push = PushGenerator(jets).GetEnumerator();
-        var rocks = new HashSet<Point>(Enumerable.Range(0,Width).Select(x => new Point(x, 0)));
+        var rocks = new HashSet<Point>(Enumerable.Range(0, Width).Select(x => new Point(x, 0)));
+        var heights = Enumerable.Range(0, Width).Select(_ => 0).ToArray();
 
         var rockNum = 1;
+        var previousStates = Enumerable.Range(0, jetLength).ToDictionary(
+            i => i,
+            _ => Enumerable.Range(0, 5).ToDictionary(i => i, _ => new Dictionary<int[], Tuple<int, int>>())
+        );
+        previousStates[0][0].Add(heights, new (0, 0));
+        var looped = false;
+        
         while (rockNum <= totalRocks)
         {
             var rock = Rockfall.ForNumber(rockNum, rocks);
@@ -31,17 +39,24 @@ public class Day17 : IAdventSolution
             }
 
             rocks = rock.RocksWithSelf();
-            
-            // check for a loop somehow
-            if (rockNum > 1 && jetIndex % jetLength == 4 && rockNum % 5 == 1)
+            heights = NormaliseHeights(rock.AddSelfToHeights(heights));
+
+            // check for a loop
+            if (!looped)
             {
-                if (rock.Position.X == 2 && !rocks.Any(p => p.Y > rock.Position.Y + 2))
+                if (previousStates[jetIndex % jetLength][rockNum % 5].Keys.Contains(heights))
                 {
-                    // loop!
-                    long heightInLoop = rocks.Max(r => r.Y) - 1;
-                    var numLoops = totalRocks / (rockNum - 1);
-                    loopedHeight = heightInLoop * numLoops;
-                    totalRocks %= (rockNum - 1);
+                    var (rockNumAtStart, heightAtStart) = previousStates[jetIndex % jetLength][rockNum % 5][heights];
+                    var loopLength = rockNum - rockNumAtStart;
+                    var heightInLoop = rocks.Max(r => r.Y) - heightAtStart;
+                    var numLoopsAfterThisOne = (totalRocks - rockNum) / loopLength;
+                    loopedHeight = 1L * heightInLoop * numLoopsAfterThisOne;
+                    totalRocks -= loopLength * numLoopsAfterThisOne;
+                    looped = true;
+                }
+                else
+                {
+                    previousStates[jetIndex % jetLength][rockNum % 5].Add(heights, new(rockNum, rocks.Max(r => r.Y)));
                 }
             }
 
@@ -69,6 +84,12 @@ public class Day17 : IAdventSolution
                 yield return direction;
             }
         }
+    }
+
+    private int[] NormaliseHeights(int[] heights)
+    {
+        var min = heights.Min();
+        return heights.Select(h => h - min).ToArray();
     }
 
     public object PartTwo(string input) => RockTower(input, 1000000000000);
@@ -125,6 +146,17 @@ public class Day17 : IAdventSolution
             return _rocksBelow;
         }
 
+        public int[] AddSelfToHeights(int[] heights)
+        {
+            for (int x = 0; x < _width; ++x)
+            {
+                // watch out, mutating the input
+                heights[x + _position.X] = _shape.Where(p => p.X == x).Max(p => p.Y) + _position.Y;
+            }
+
+            return heights;
+        }
+
         public static Rockfall ForNumber(int rockNumber, HashSet<Point> rocks)
         {
             if (rockNumber % 5 == 1)
@@ -139,7 +171,7 @@ public class Day17 : IAdventSolution
             {
                 return new Rockfall(new HashSet<Point>
                 {
-                    new(0, 1), new(1, 0), new(1, 1), new(1, 2), new (2, 1)
+                    new(0, 1), new(1, 0), new(1, 2), new (2, 1)
                 }, rocks);
             }
             
