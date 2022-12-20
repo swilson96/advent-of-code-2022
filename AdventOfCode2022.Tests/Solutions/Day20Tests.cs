@@ -17,7 +17,7 @@ public class Day20Tests
     {
         var result = new Day20().PartOne(ExampleInput);
         
-        Assert.Equal(3, result);
+        Assert.Equal(3L, result);
     }
 
     [Fact]
@@ -25,6 +25,6 @@ public class Day20Tests
     {
         var result = new Day20().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(1623178306L, result);
     }
 }
