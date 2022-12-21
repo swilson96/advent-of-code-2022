@@ -102,8 +102,7 @@ public class Day21 : IAdventSolution
         
         private readonly string _operation;
 
-        private long? _lCache;
-        private long? _rCache;
+        private long? _cache;
         
         public Calculator(string id, string lhs, string rhs, string operation) : base(id)
         {
@@ -130,48 +129,23 @@ public class Day21 : IAdventSolution
 
         public override Tuple<long, bool> EvaluateWithCacheData(Dictionary<string, Monkey> others)
         {
-            long a;
-            long b;
-
-            var canCache = true;
-
-            if (_lCache == null)
+            if (_cache != null)
             {
-                var (val, canCacheLeft) = others[LHS].EvaluateWithCacheData(others);
-                a = val;
-                if (canCacheLeft)
-                {
-                    _lCache = val;
-                }
-                else
-                {
-                    canCache = false;
-                }
+                return new Tuple<long, bool>(_cache.Value, true);
             }
-            else
+
+            var a = others[LHS].EvaluateWithCacheData(others);
+            var b = others[RHS].EvaluateWithCacheData(others);
+
+            var canCache = a.Item2 && b.Item2;
+            var result = ExecuteOperation(a.Item1, b.Item1);
+            
+            if (a.Item2 && b.Item2)
             {
-                a = _lCache.Value;
+                _cache = result;
             }
             
-            if (_rCache == null)
-            {
-                var (val, canCacheRight) = others[RHS].EvaluateWithCacheData(others);
-                b = val;
-                if (canCacheRight)
-                {
-                    _rCache = val;
-                }
-                else
-                {
-                    canCache = false;
-                }
-            }
-            else
-            {
-                b = _rCache.Value;
-            }
-            
-            return new Tuple<long, bool>(ExecuteOperation(a, b), canCache);
+            return new Tuple<long, bool>(result, canCache);
         }
     }
 }
