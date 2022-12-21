@@ -22,24 +22,10 @@ public class Day21 : IAdventSolution
             .Select(ParseMonkey)
             .ToDictionary(m => m.Id, m => m);
 
-        var root = (Calculator)monkeys["root"];
-        var lhs = monkeys[root.LHS];
-        var rhs = monkeys[root.RHS];
-        var humn = (Yeller)monkeys["humn"];
+        var originalRoot = (Calculator)monkeys["root"];
+        var newRoot = new Calculator("root", originalRoot.LHS, originalRoot.RHS, "-");
 
-        var guess = 1L;
-        var timeout = int.MaxValue;
-        while (guess < timeout)
-        {
-            humn.SetValue(guess);
-            if (lhs.EvaluateWithCacheData(monkeys).Item1 == rhs.EvaluateWithCacheData(monkeys).Item1)
-            {
-                return guess;
-            }
-            ++guess;
-        }
-
-        return 0;
+        return newRoot.HumanValueToHitTarget(0, monkeys);
     }
 
     private Monkey ParseMonkey(string inputLine)
@@ -72,6 +58,8 @@ public class Day21 : IAdventSolution
         public abstract long Evaluate(Dictionary<string, Monkey> others);
 
         public abstract Tuple<long, bool> EvaluateWithCacheData(Dictionary<string, Monkey> others);
+
+        public abstract long HumanValueToHitTarget(long target, Dictionary<string, Monkey> others);
     }
 
     private class Yeller : Monkey
@@ -88,10 +76,14 @@ public class Day21 : IAdventSolution
         public override long Evaluate(Dictionary<string, Monkey> others) => _value;
         
         public override Tuple<long, bool> EvaluateWithCacheData(Dictionary<string, Monkey> others) => new (_value, !_isHuman);
-        
-        public void SetValue(long value)
+        public override long HumanValueToHitTarget(long target, Dictionary<string, Monkey> others)
         {
-            _value = value;
+            if (!_isHuman)
+            {
+                throw new NotImplementedException();
+            }
+
+            return target;
         }
     }
 
@@ -146,6 +138,45 @@ public class Day21 : IAdventSolution
             }
             
             return new Tuple<long, bool>(result, canCache);
+        }
+
+        public override long HumanValueToHitTarget(long target, Dictionary<string, Monkey> others)
+        {
+            var a = others[LHS].EvaluateWithCacheData(others);
+            var b = others[RHS].EvaluateWithCacheData(others);
+            
+            if (a.Item2 && b.Item2)
+            {
+                throw new Exception("what");
+            }
+
+            if (b.Item2)
+            {
+                var newTarget = _operation switch
+                {
+                    "+" => target - b.Item1,
+                    "-" => target + b.Item1,
+                    "*" => target / b.Item1,
+                    "/" => target * b.Item1,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                return others[LHS].HumanValueToHitTarget(newTarget, others);
+            }
+
+            if (a.Item2)
+            {
+                var newTarget = _operation switch
+                {
+                    "+" => target - a.Item1,
+                    "-" => a.Item1 - target,
+                    "*" => target / a.Item1,
+                    "/" => target * a.Item1,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                return others[RHS].HumanValueToHitTarget(newTarget, others);
+            }
+
+            throw new Exception($"Both sides need humn to evaluate (monkey {Id})");
         }
     }
 }
