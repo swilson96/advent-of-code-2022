@@ -33,6 +33,6 @@ hmdt: 32";
     {
         var result = new Day21().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(301L, result);
     }
 }

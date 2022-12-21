@@ -16,6 +16,32 @@ public class Day21 : IAdventSolution
         return monkeys["root"].Evaluate(monkeys);
     }
 
+    public object PartTwo(string input)
+    {
+        var monkeys = input.Split(Environment.NewLine)
+            .Select(ParseMonkey)
+            .ToDictionary(m => m.Id, m => m);
+
+        var root = (Calculator)monkeys["root"];
+        var lhs = monkeys[root.LHS];
+        var rhs = monkeys[root.RHS];
+        var humn = (Yeller)monkeys["humn"];
+
+        var guess = 1L;
+        var timeout = int.MaxValue;
+        while (guess < timeout)
+        {
+            humn.SetValue(guess);
+            if (lhs.EvaluateWithCacheData(monkeys).Item1 == rhs.EvaluateWithCacheData(monkeys).Item1)
+            {
+                return guess;
+            }
+            ++guess;
+        }
+
+        return 0;
+    }
+
     private Monkey ParseMonkey(string inputLine)
     {
         var yellerMatch = YellerRegex.Match(inputLine);
@@ -34,8 +60,6 @@ public class Day21 : IAdventSolution
             calculatorMatch.Groups[3].Value);
     }
 
-    public object PartTwo(string input) => 0;
-
     private abstract class Monkey
     {
         public string Id { get; }
@@ -46,45 +70,108 @@ public class Day21 : IAdventSolution
         }
 
         public abstract long Evaluate(Dictionary<string, Monkey> others);
+
+        public abstract Tuple<long, bool> EvaluateWithCacheData(Dictionary<string, Monkey> others);
     }
 
     private class Yeller : Monkey
     {
-        private readonly long _value;
+        private long _value;
+        private bool _isHuman;
         
         public Yeller(string id, long value) : base(id)
         {
             _value = value;
+            _isHuman = id == "humn";
         }
 
         public override long Evaluate(Dictionary<string, Monkey> others) => _value;
+        
+        public override Tuple<long, bool> EvaluateWithCacheData(Dictionary<string, Monkey> others) => new (_value, !_isHuman);
+        
+        public void SetValue(long value)
+        {
+            _value = value;
+        }
     }
 
     private class Calculator : Monkey
     {
-        private readonly string _a;
-        private readonly string _b;
-        private readonly string _operation;
+        public string LHS { get; }
+        public string RHS { get; }
         
-        public Calculator(string id, string a, string b, string operation) : base(id)
+        private readonly string _operation;
+
+        private long? _lCache;
+        private long? _rCache;
+        
+        public Calculator(string id, string lhs, string rhs, string operation) : base(id)
         {
-            _a = a;
-            _b = b;
+            LHS = lhs;
+            RHS = rhs;
             _operation = operation;
         }
 
         public override long Evaluate(Dictionary<string, Monkey> others)
         {
-            var a = others[_a].Evaluate(others);
-            var b = others[_b].Evaluate(others);
-            return _operation switch
+            var a = others[LHS].Evaluate(others);
+            var b = others[RHS].Evaluate(others);
+            return ExecuteOperation(a, b);
+        }
+
+        private long ExecuteOperation(long a, long b) => _operation switch
+        {
+            "+" => a + b,
+            "-" => a - b,
+            "*" => a * b,
+            "/" => a / b,
+            _ => throw new AggregateException($"Unknown monkey operation {_operation}")
+        };
+
+        public override Tuple<long, bool> EvaluateWithCacheData(Dictionary<string, Monkey> others)
+        {
+            long a;
+            long b;
+
+            var canCache = true;
+
+            if (_lCache == null)
             {
-                "+" => a + b,
-                "-" => a - b,
-                "*" => a * b,
-                "/" => a / b,
-                _ => throw new AggregateException($"Unknown monkey operation {_operation}")
-            };
+                var (val, canCacheLeft) = others[LHS].EvaluateWithCacheData(others);
+                a = val;
+                if (canCacheLeft)
+                {
+                    _lCache = val;
+                }
+                else
+                {
+                    canCache = false;
+                }
+            }
+            else
+            {
+                a = _lCache.Value;
+            }
+            
+            if (_rCache == null)
+            {
+                var (val, canCacheRight) = others[RHS].EvaluateWithCacheData(others);
+                b = val;
+                if (canCacheRight)
+                {
+                    _rCache = val;
+                }
+                else
+                {
+                    canCache = false;
+                }
+            }
+            else
+            {
+                b = _rCache.Value;
+            }
+            
+            return new Tuple<long, bool>(ExecuteOperation(a, b), canCache);
         }
     }
 }
