@@ -116,12 +116,10 @@ public class Day22 : IAdventSolution
                         else
                         {
                             // left of 3 into top of 4
-                            n = new Point(n.Y - _cubeSize, _cubeSize);
+                            n = new Point(n.Y - _cubeSize, 2 * _cubeSize);
                             d = Direction.U;
                         }
                     }
-                        
-                    n = new Point(Math.Max(Array.LastIndexOf(grid[n.Y], '.'), Array.LastIndexOf(grid[n.Y], '#')), n.Y);
                 }
 
                 if (nextDir == Direction.D)
@@ -218,7 +216,7 @@ public class Day22 : IAdventSolution
                     else if (n.Y >= grid.Length)
                     {
                         Assert(n.Y == 4 * _cubeSize);
-                        // bottom of 6 into top of two
+                        // bottom of 6 into top of 2
                         n = new Point( n.X + 2 * _cubeSize, 0);
                     }
                 }
