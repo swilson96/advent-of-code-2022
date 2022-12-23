@@ -26,12 +26,4 @@ public class Day22Tests
         
         Assert.Equal(6032, result);
     }
-
-    [Fact]
-    public void PartTwoExample()
-    {
-        var result = new Day22().PartTwo(ExampleInput);
-        
-        Assert.Equal(0, result);
-    }
 }
