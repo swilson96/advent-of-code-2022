@@ -21,9 +21,9 @@ public class Day17 : IAdventSolution
         var rockNum = 1;
         var previousStates = Enumerable.Range(0, jetLength).ToDictionary(
             i => i,
-            _ => Enumerable.Range(0, 5).ToDictionary(i => i, _ => new Dictionary<int[], Tuple<int, int>>())
+            _ => Enumerable.Range(0, 5).ToDictionary(i => i, _ => new Dictionary<int, Tuple<int, int>>())
         );
-        previousStates[0][0].Add(heights, new (0, 0));
+        previousStates[0][0].Add(HashHeights(heights), new (0, 0));
         var looped = false;
         
         while (rockNum <= totalRocks)
@@ -44,9 +44,9 @@ public class Day17 : IAdventSolution
             // check for a loop
             if (!looped)
             {
-                if (previousStates[jetIndex % jetLength][rockNum % 5].Keys.Contains(heights))
+                if (previousStates[jetIndex % jetLength][rockNum % 5].Keys.Contains(HashHeights(heights)))
                 {
-                    var (rockNumAtStart, heightAtStart) = previousStates[jetIndex % jetLength][rockNum % 5][heights];
+                    var (rockNumAtStart, heightAtStart) = previousStates[jetIndex % jetLength][rockNum % 5][HashHeights(heights)];
                     var loopLength = rockNum - rockNumAtStart;
                     var heightInLoop = rocks.Max(r => r.Y) - heightAtStart;
                     var numLoopsAfterThisOne = (totalRocks - rockNum) / loopLength;
@@ -56,7 +56,7 @@ public class Day17 : IAdventSolution
                 }
                 else
                 {
-                    previousStates[jetIndex % jetLength][rockNum % 5].Add(heights, new(rockNum, rocks.Max(r => r.Y)));
+                    previousStates[jetIndex % jetLength][rockNum % 5].Add(HashHeights(heights), new(rockNum, rocks.Max(r => r.Y)));
                 }
             }
 
@@ -65,6 +65,9 @@ public class Day17 : IAdventSolution
         
         return rocks.Max(r => r.Y) + loopedHeight;
     }
+
+    private int HashHeights(int[] heights) => 
+        HashCode.Combine(heights[0], heights[1], heights[2], heights[3], heights[4], heights[5], heights[6]);
 
     public IEnumerable<Direction> PushGenerator(string input)
     {
