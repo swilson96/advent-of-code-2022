@@ -32,8 +32,8 @@ public class Day17Tests
         
         Assert.Equal(expectedHeight, result);
     }
-
-    [Fact(Skip = "Part 2 still too slow in this example")]
+    
+    [Fact]
     public void PartTwoExample()
     {
         var result = new Day17().PartTwo(ExampleInput);
