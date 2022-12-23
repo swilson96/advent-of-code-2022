@@ -86,6 +86,8 @@ public class Day22 : IAdventSolution
                 {
                     if (n.X < 0)
                     {
+                        Assert(n.X == -1);
+                        Assert(n.Y >= 2 * _cubeSize);
                         if (n.Y < _cubeSize * 3)
                         {
                             // left of 4 into left of 1 upside down
@@ -95,12 +97,16 @@ public class Day22 : IAdventSolution
                         else
                         {
                             // left of 6 into top of 1
-                            n = new Point(2 * _cubeSize - n.Y, 0);
+                            Assert(n.Y < 4 * _cubeSize);
+                            n = new Point(n.Y - 2 * _cubeSize, 0);
                             d = Direction.U;
                         }
                     }
                     else if (grid[n.Y][n.X] == ' ')
                     {
+                        Assert(n.X == _cubeSize - 1);
+                        Assert(n.Y < 2 * _cubeSize);
+                        Assert(n.Y > 0);
                         if (n.Y < _cubeSize)
                         {
                             // left of 1 into left of 4 upside down
@@ -122,21 +128,26 @@ public class Day22 : IAdventSolution
                 {
                     if (n.Y < 0)
                     {
+                        Assert(n.Y == -1);
                         if (n.X < 2 * _cubeSize)
                         {
                             // top of 1 into left of 6
+                            Assert(n.X >= _cubeSize);
                             n = new Point(0, 2 * _cubeSize + n.X);
                             d = Direction.R;
                         }
                         else
                         {
                             // top of 2 into bottom of 6
+                            Assert(n.X < 3 * _cubeSize);
                             n = new Point(n.X - 2 * _cubeSize, 4 * _cubeSize - 1);
                         }
                     }
                     else if (grid[n.Y][n.X] == ' ')
                     {
                         // top of 4 into left of 3
+                        Assert(n.Y == 2 * _cubeSize - 1);
+                        Assert(n.X < _cubeSize);
                         n = new Point(_cubeSize, _cubeSize + n.X);
                         d = Direction.R;
                     }
@@ -151,25 +162,29 @@ public class Day22 : IAdventSolution
                     if (n.X >= grid[n.Y].Length)
                     {
                         if (n.Y < _cubeSize) {
-                            // right of two into right of 5
+                            // right of two into right of 5 upside down
+                            Assert(n.X == 3 * _cubeSize);
                             n = new Point(2 * _cubeSize - 1, 3 * _cubeSize - n.Y - 1);
                             d = Direction.L;
                         }
                         else if (n.Y < 2 * _cubeSize)
                         {
                             // right of 3 into bottom of 2
+                            Assert(n.X == 2 * _cubeSize);
                             n = new Point( _cubeSize + n.Y, _cubeSize - 1);
                             d = Direction.D;
                         }
                         else if (n.Y < 3 * _cubeSize)
                         {
-                            // right of 5 into right of 2
+                            // right of 5 into right of 2 upside down
+                            Assert(n.X == 2 * _cubeSize);
                             n = new Point( 3 * _cubeSize - 1, 3 * _cubeSize - n.Y - 1);
                             d = Direction.L;
                         }
                         else
                         {
                             // right of 6 into bottom of 5
+                            Assert(n.X == _cubeSize);
                             n = new Point( n.Y - 2 * _cubeSize, 3 * _cubeSize - 1);
                             d = Direction.D;
                         }
@@ -178,16 +193,23 @@ public class Day22 : IAdventSolution
 
                 if (nextDir == Direction.U)
                 {
+                    //  12
+                    //  3
+                    // 45
+                    // 6
                     if (n.Y < grid.Length && n.X >= grid[n.Y].Length)
                     {
                         if (n.X < 2 * _cubeSize)
                         {
+                            Assert(n.Y == 3 * _cubeSize);
+                            Assert(n.X >= _cubeSize);
                             // bottom of 5 into right of 6
                             n = new Point( _cubeSize - 1, 2 * _cubeSize + n.X);
                             d = Direction.L;
                         }
                         else
                         {
+                            Assert(n.Y == _cubeSize);
                             // bottom of 2 into right of 3
                             n = new Point( 2 * _cubeSize - 1, n.X - _cubeSize);
                             d = Direction.L;
@@ -195,6 +217,7 @@ public class Day22 : IAdventSolution
                     }
                     else if (n.Y >= grid.Length)
                     {
+                        Assert(n.Y == 4 * _cubeSize);
                         // bottom of 6 into top of two
                         n = new Point( n.X + 2 * _cubeSize, 0);
                     }
@@ -205,12 +228,25 @@ public class Day22 : IAdventSolution
                     return new Tuple<Point, Direction>(next, nextDir);
                 }
 
+                if (grid[n.Y][n.X] != '.')
+                {
+                    throw new Exception("off the cube");
+                }
+
                 next = n;
                 nextDir = d;
                 --toGo;
             }
 
             return new Tuple<Point, Direction>(next, nextDir);
+        }
+
+        private void Assert(bool condition)
+        {
+            if (!condition)
+            {
+                throw new Exception("wrong!");
+            }
         }
 
         public override string ToString() => $"Day22.Move{{{_distance}}}";
