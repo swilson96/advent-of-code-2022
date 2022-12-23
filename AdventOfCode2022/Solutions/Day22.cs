@@ -68,10 +68,10 @@ public class Day22 : IAdventSolution
             _cubeSize = cubeSize;
         }
 
-        public override Tuple<Point, Direction> Apply(Point p, Direction dStart, char[][] grid)
+        public override Tuple<Point, Direction> Apply(Point pStart, Direction dStart, char[][] grid)
         {
             var toGo = _distance;
-            var next = p;
+            var next = pStart;
             var nextDir = dStart;
             while (toGo > 0)
             {
@@ -225,10 +225,10 @@ public class Day22 : IAdventSolution
             _distance = distance;
         }
 
-        public override Tuple<Point, Direction> Apply(Point p, Direction dStart, char[][] grid)
+        public override Tuple<Point, Direction> Apply(Point pStart, Direction dStart, char[][] grid)
         {
             var toGo = _distance;
-            var next = p;
+            var next = pStart;
             while (toGo > 0)
             {
                 var n = next.Add(dStart, 1);
@@ -295,8 +295,8 @@ public class Day22 : IAdventSolution
             _hand = hand;
         }
 
-        public override Tuple<Point, Direction> Apply(Point p, Direction dStart, char[][] grid) =>
-            new (p, dStart switch
+        public override Tuple<Point, Direction> Apply(Point pStart, Direction dStart, char[][] grid) =>
+            new (pStart, dStart switch
             {
                 // note: Direction.U is the question's down!
                 Direction.R => _hand == Hand.R ? Direction.U : Direction.D,
@@ -340,6 +340,6 @@ public class Day22 : IAdventSolution
 
     private abstract class Instruction
     {
-        public abstract Tuple<Point, Direction> Apply(Point p, Direction dStart, char[][] grid);
+        public abstract Tuple<Point, Direction> Apply(Point pStart, Direction dStart, char[][] grid);
     }
 }
