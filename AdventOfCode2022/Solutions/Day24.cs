@@ -6,6 +6,16 @@ public class Day24 : IAdventSolution
 {
     public object PartOne(string input)
     {
+        var valley = ParseValley(input);
+
+        var start = valley.Start;
+        var destination = valley.End;
+
+        return valley.Travel(start, destination);
+    }
+
+    private Valley ParseValley(string input)
+    {
         var lines = input.Split(Environment.NewLine).ToList();
         var width = lines[0].Length;
         var length = lines.Count;
@@ -15,57 +25,22 @@ public class Day24 : IAdventSolution
             .Select(b => b!)
             .ToList();
 
-        var unvisited = new HashSet<Point>();
-        var start = new Point(1, 0);
-        var destination = new Point(width - 2, length - 1);
-        
-        unvisited.Add(start);
-
-        var time = 1;
-        while (unvisited.Count > 0)
-        {
-            var unvisitedNextRound = new HashSet<Point>();
-            blizzards = blizzards.Select(b => b.Move(length, width)).ToList();
-            var blizzardPositions = new HashSet<Point>(blizzards.Select(b => b.Position));
-
-            foreach (var current in unvisited)
-            {
-                foreach (var neighbour in current.Neighbours)
-                {
-                    if (neighbour.Equals(destination))
-                    {
-                        return time;
-                    }
-                    
-                    if (neighbour.Y < 1 || neighbour.Y >= length - 1 || neighbour.X < 1 ||
-                        neighbour.X >= width - 1)
-                    {
-                        continue;
-                    }
-
-                    if (blizzardPositions.Contains(neighbour))
-                    {
-                        continue;
-                    }
-
-                    unvisitedNextRound.Add(neighbour);
-                }
-                
-                // waiting is always an option, if there's no blizzard colliding with us this minute
-                if (!blizzardPositions.Contains(current))
-                {
-                    unvisitedNextRound.Add(current);
-                }
-            }
-
-            unvisited = unvisitedNextRound;
-            ++time;
-        }
-
-        return -1;
+        return new Valley(length, width, blizzards);
     }
 
-    public object PartTwo(string input) => 0;
+    public object PartTwo(string input)
+    {
+        var valley = ParseValley(input);
+
+        var start = valley.Start;
+        var destination = valley.End;
+
+        var toEnd = valley.Travel(start, destination);
+        var backToStart = valley.Travel(destination, start);
+        var backToEnd = valley.Travel(start, destination);
+
+        return toEnd + backToStart + backToEnd;
+    }
 
     private class Blizzard
     {
@@ -107,4 +82,72 @@ public class Day24 : IAdventSolution
 
         public override string ToString() => $"Day24.Blizzard{{{Position}, {Direction}}}";
     }
+    
+    private class Valley
+    {
+        private int _length;
+        private int _width;
+        private List<Blizzard> _blizzards;
+        
+        public Valley(int length, int width, List<Blizzard> blizzards)
+        {
+            _length = length;
+            _width = width;
+            _blizzards = blizzards;
+        }
+
+        public Point Start => new (1, 0);
+
+        public Point End => new (_width - 1, _length - 2);
+
+        public int Travel(Point start, Point destination)
+        {
+            var unvisited = new HashSet<Point>();
+            unvisited.Add(start);
+
+            var time = 1;
+            while (unvisited.Count > 0)
+            {
+                var unvisitedNextRound = new HashSet<Point>();
+                _blizzards = _blizzards.Select(b => b.Move(_length, _width)).ToList();
+                var blizzardPositions = new HashSet<Point>(_blizzards.Select(b => b.Position));
+
+                foreach (var current in unvisited)
+                {
+                    foreach (var neighbour in current.Neighbours)
+                    {
+                        if (neighbour.Equals(destination))
+                        {
+                            return time;
+                        }
+                    
+                        if (neighbour.Y < 1 || neighbour.Y >= _length - 1 || neighbour.X < 1 ||
+                            neighbour.X >= _width - 1)
+                        {
+                            continue;
+                        }
+
+                        if (blizzardPositions.Contains(neighbour))
+                        {
+                            continue;
+                        }
+
+                        unvisitedNextRound.Add(neighbour);
+                    }
+                
+                    // waiting is always an option, if there's no blizzard colliding with us this minute
+                    if (!blizzardPositions.Contains(current))
+                    {
+                        unvisitedNextRound.Add(current);
+                    }
+                }
+
+                unvisited = unvisitedNextRound;
+                ++time;
+            }
+
+            throw new Exception($"can't get from {start} to {destination} in this valley at this time");
+        }
+    }
 }
+

@@ -24,6 +24,6 @@ public class Day24Tests
     {
         var result = new Day24().PartTwo(ExampleInput);
         
-        Assert.Equal(0, result);
+        Assert.Equal(54, result);
     }
 }
