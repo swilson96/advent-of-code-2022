@@ -58,7 +58,7 @@ public class Day24 : IAdventSolution
                 }
             }
 
-            unvisited.UnionWith(unvisitedNextRound);
+            unvisited = unvisitedNextRound;
             ++time;
         }
 
