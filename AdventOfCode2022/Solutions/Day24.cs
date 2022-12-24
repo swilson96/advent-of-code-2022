@@ -10,13 +10,15 @@ public class Day24 : IAdventSolution
         var width = lines[0].Length;
         var length = lines.Count;
         var blizzards = lines.Skip(1).Take(length - 2).SelectMany(
-                (l, y) => l.Skip(1).Take(width - 2).Where(c => c != '.').Select((c, x) => Blizzard.Parse(c, x, y)))
+                (l, y) => l.Skip(1).Take(width - 2).Select((c, x) => c == '.' ? null : Blizzard.Parse(c, x + 1, y + 1)))
+            .Where(b => b != null)
+            .Select(b => b!)
             .ToList();
 
         var unvisited = new HashSet<Point>();
         var start = new Point(1, 0);
         var destination = new Point(width - 2, length - 1);
-
+        
         unvisited.Add(start);
 
         var time = 1;
@@ -30,13 +32,15 @@ public class Day24 : IAdventSolution
             {
                 foreach (var neighbour in current.Neighbours)
                 {
+                    if (neighbour.Equals(destination))
+                    {
+                        return time;
+                    }
+                    
                     if (neighbour.Y < 1 || neighbour.Y >= length - 1 || neighbour.X < 1 ||
                         neighbour.X >= width - 1)
                     {
-                        if (!neighbour.Equals(destination))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     if (blizzardPositions.Contains(neighbour))
@@ -47,11 +51,6 @@ public class Day24 : IAdventSolution
                     unvisitedNextRound.Add(neighbour);
                 }
                 
-                if (current.Equals(destination))
-                {
-                    return time + 1;
-                }
-
                 // waiting is always an option, if there's no blizzard colliding with us this minute
                 if (!blizzardPositions.Contains(current))
                 {
