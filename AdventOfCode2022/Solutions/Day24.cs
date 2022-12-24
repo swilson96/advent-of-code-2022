@@ -39,12 +39,6 @@ public class Day24 : IAdventSolution
                         }
                     }
 
-                    // can always revisit!
-                    // if (visited.Contains(neighbour))
-                    // {
-                    //     continue;
-                    // }
-
                     if (blizzardPositions.Contains(neighbour))
                     {
                         continue;
@@ -58,9 +52,11 @@ public class Day24 : IAdventSolution
                     return time + 1;
                 }
 
-                // waiting is always an option!?
-                unvisitedNextRound.Add(current);
-                // unvisited.Remove(current); 
+                // waiting is always an option, if there's no blizzard colliding with us this minute
+                if (!blizzardPositions.Contains(current))
+                {
+                    unvisitedNextRound.Add(current);
+                }
             }
 
             unvisited.UnionWith(unvisitedNextRound);
