@@ -64,7 +64,7 @@ public class Day12 : IAdventSolution
             current = unvisited.OrderBy(u => distance[u.Y][u.X]).First();
         }
 
-        return 0;
+        return -1;
     }
 
     public object PartTwo(string input)
