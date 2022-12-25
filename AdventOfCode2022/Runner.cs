@@ -17,7 +17,8 @@ if (advent.IsAdventNow()) {
     }
     else
     {
-        Console.WriteLine("Only {0} days until Christmas!", 25 - day);
+        var daysString = day == 24 ? "day" : "days";
+        Console.WriteLine($"Only {25 - day} {daysString} until Christmas!");
     }
 }
 
