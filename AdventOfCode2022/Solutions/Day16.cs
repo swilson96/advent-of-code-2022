@@ -272,7 +272,8 @@ public class Day16 : IAdventSolution
         {
             var visited = new HashSet<string> { start };
             var toVisit = new HashSet<string>(_valves.Keys.Where(k => _valves[k].Flow != 0));
-            var routes = AllRoutes(start, visited, toVisit, timeLeft, false);
+            var routes = AllRoutes(start, visited, toVisit, timeLeft, false)
+                .Where(r => r.Count > 1);
             var scores = routes.Select(r => ScoreRouteWithElephant(r, timeLeft));
             
             return scores.Max();
@@ -281,13 +282,15 @@ public class Day16 : IAdventSolution
         public int ScoreRouteWithElephant(List<string> route, int timeLeft)
         {
             var start = route[0];
+            var first = route[1];
             var visited = new HashSet<string> { start };
             var toVisit = new HashSet<string>(_valves.Keys.Where(k => _valves[k].Flow != 0).Where(k => !route.Contains(k) && k != start));
-            var routes = AllRoutes(start, visited, toVisit, timeLeft, true);
+            var routes = AllRoutes(start, visited, toVisit, timeLeft, true)
+                .Where(r => r.Count > 1 && string.Compare(r[1], first, StringComparison.Ordinal) > 0);
 
             var scores = routes.Select(r => ScoreRoute(r, timeLeft));
             
-            return ScoreRoute(route, timeLeft) + scores.Max();
+            return ScoreRoute(route, timeLeft) + scores.Append(0).Max();
         }
     }
 }
