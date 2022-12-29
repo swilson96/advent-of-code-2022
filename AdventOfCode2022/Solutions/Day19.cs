@@ -5,6 +5,7 @@ namespace AdventOfCode2022.Solutions;
 public class Day19 : IAdventSolution
 {
     public object PartOne(string input) => input.Split(Environment.NewLine)
+        .AsParallel()
         .Select(Blueprint.Parse)
         .Select(b => ScoreBlueprint(b, 24))
         .Select((s, i) => s * (i + 1))
@@ -52,6 +53,7 @@ public class Day19 : IAdventSolution
     
     public object PartTwo(string input) => input.Split(Environment.NewLine)
         .Take(3)
+        .AsParallel()
         .Select(Blueprint.Parse)
         .Select(b => ScoreBlueprint(b, 32))
         .Aggregate(1, (acc, next) => acc * next);

@@ -24,9 +24,6 @@ public class Day23 : IAdventSolution
 
             foreach (var elf in elves)
             {
-                // var closePoints = EightNeighbouringPoints(elf.Position)
-                //     .ToDictionary(p => p, p => elfPositions.Contains(p));
-                
                 if (!EightNeighbouringPoints(elf.Position).Any(elfPositions.Contains))
                 {
                     continue;

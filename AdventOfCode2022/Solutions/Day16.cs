@@ -149,7 +149,7 @@ public class Day16 : IAdventSolution
             // Cutoff is a bit of a guess
             var topRoutes = routes.Where(r => ScoreRoute(r, timeLeft) > 800).ToList();
             Console.WriteLine($"found {topRoutes.Count} routes with a good score");
-            var scores = topRoutes.Select(r => ScoreRouteWithElephant(r, timeLeft));
+            var scores = topRoutes.AsParallel().Select(r => ScoreRouteWithElephant(r, timeLeft));
             
             return scores.Max();
         }
