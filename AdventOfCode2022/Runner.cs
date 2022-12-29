@@ -25,7 +25,7 @@ if (advent.IsAdventNow()) {
 var dayToRun = 0;
 try
 {
-    dayToRun = 16; //DayToRun();
+    dayToRun = DayToRun();
 }
 catch (ArgumentException e)
 {
