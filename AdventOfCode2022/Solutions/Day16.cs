@@ -1,6 +1,4 @@
 using System.Text.RegularExpressions;
-// using MoreLinq;
-// using MoreLinq.Extensions;
 
 namespace AdventOfCode2022.Solutions;
 
@@ -12,8 +10,6 @@ public class Day16 : IAdventSolution
     {
         var valves = ParseValves(input);
 
-        // return TopScore("AA", null, valves, 30);
-
         var cave = new Cave(valves);
         var score = cave.TopScore("AA", 30);
         return score;
@@ -22,131 +18,10 @@ public class Day16 : IAdventSolution
     public object PartTwo(string input)
     {
         var valves = ParseValves(input);
-
-        // return TopScoreWithElephant("AA", "AA", null, null, valves, 26);
         
         var cave = new Cave(valves);
         var score = cave.TopScoreWithElephant("AA", 26);
         return score;
-    }
-
-    /**
-     * Naive depth-first search, includes a large number of duff routes. Too slow.
-     */
-    private int TopScore(string startLocation, string? previous, Dictionary<string, Valve> valves, int timeRemaining)
-    {
-        if (timeRemaining == 0)
-        {
-            return 0;
-        }
-        
-        var current = valves[startLocation];
-        var best = 0;
-        if (!current.IsOn && current.Flow > 0)
-        {
-            current.IsOn = true;
-            if (valves.All(v => v.Value.IsOn || v.Value.Flow <= 0))
-            {
-                current.IsOn = false;
-                return (timeRemaining - 1) * current.Flow;
-            }
-            // can go back
-            best = TopScore(startLocation, null, valves, timeRemaining - 1) + (timeRemaining - 1) * current.Flow;
-            current.IsOn = false;
-            
-            if (current.Flow > 3) // Randomly guessed this cutoff
-            {
-                return best;
-            }
-        }
-
-        return Enumerable.Prepend(current.Neighbours
-                .Where(neighbour => neighbour != previous)
-                .Select(neighbour => TopScore(valves[neighbour].Name, startLocation, valves, timeRemaining - 1)), best)
-            .Max();
-    }
-    
-    private int TopScoreWithElephant(string protagonistStart, string elephantStart, string? pPrev, string? ePrev, Dictionary<string, Valve> valves, int timeRemaining)
-    {
-        if (timeRemaining == 0)
-        {
-            return 0;
-        }
-        
-        var pCurrent = valves[protagonistStart];
-        var eCurrent = valves[elephantStart];
-        var bestBothSwitch = 0;
-        var bestProtagonistSwitches = 0;
-        var bestElephantSwitches = 0;
-        if (!pCurrent.IsOn && pCurrent.Flow > 0)
-        {
-            pCurrent.IsOn = true;
-            if (valves.All(v => v.Value.IsOn || v.Value.Flow <= 0))
-            {
-                pCurrent.IsOn = false;
-                return (timeRemaining - 1) * pCurrent.Flow;
-            }
-            if (elephantStart != protagonistStart && !eCurrent.IsOn && eCurrent.Flow > 0)
-            {
-                eCurrent.IsOn = true;
-                if (valves.All(v => v.Value.IsOn || v.Value.Flow <= 0))
-                {
-                    eCurrent.IsOn = false;
-                    pCurrent.IsOn = false;
-                    return (timeRemaining - 1) * (pCurrent.Flow + eCurrent.Flow);
-                }
-                bestBothSwitch = TopScoreWithElephant(protagonistStart, elephantStart, null, null, valves, timeRemaining - 1) + (timeRemaining - 1) * (pCurrent.Flow + eCurrent.Flow);
-                eCurrent.IsOn = false;
-                
-                if (pCurrent.Flow > 3 && eCurrent.Flow > 3)
-                {
-                    pCurrent.IsOn = false;
-                    return bestBothSwitch;
-                }
-            }
-            
-            // elephant moves instead of switching
-            bestProtagonistSwitches = Enumerable.Prepend(eCurrent.Neighbours
-                    .Where(neighbour => neighbour != pPrev && neighbour != ePrev)
-                    .Select(eNeighbour => TopScoreWithElephant(protagonistStart, valves[eNeighbour].Name, null, elephantStart, valves, timeRemaining - 1)), 0)
-                .Max() + (timeRemaining - 1) * pCurrent.Flow;
-
-            pCurrent.IsOn = false;
-            
-            if (pCurrent.Flow > 3)
-            {
-                return bestProtagonistSwitches;
-            }
-        } 
-        else if (elephantStart != protagonistStart && !eCurrent.IsOn && eCurrent.Flow > 0)
-        {
-            eCurrent.IsOn = true;
-            if (valves.All(v => v.Value.IsOn || v.Value.Flow <= 0))
-            {
-                eCurrent.IsOn = false;
-                return (timeRemaining - 1) * eCurrent.Flow;
-            }
-            bestElephantSwitches = Enumerable.Prepend(pCurrent.Neighbours
-                    .Where(neighbour => neighbour != pPrev && neighbour != ePrev)
-                    .Select(neighbour => TopScoreWithElephant(valves[neighbour].Name, elephantStart, protagonistStart, null, valves, timeRemaining - 1)), 0)
-                .Max() + (timeRemaining - 1) * eCurrent.Flow;
-            eCurrent.IsOn = false;
-                    
-            if (eCurrent.Flow > 3)
-            {
-                return bestElephantSwitches;
-            }
-        }
-
-        return Enumerable.Prepend(pCurrent.Neighbours
-                .Where(neighbour => neighbour != pPrev && neighbour != ePrev)
-                .SelectMany(neighbour => eCurrent.Neighbours
-                    .Where(eNeighbour => eNeighbour != ePrev)
-                    .Where(eNeighbour => elephantStart != protagonistStart || string.Compare(eNeighbour, neighbour, StringComparison.Ordinal) > 0) // diagonal
-                    .Select(eNeighbour => TopScoreWithElephant(valves[neighbour].Name, valves[eNeighbour].Name, protagonistStart, elephantStart, valves, timeRemaining - 1)))
-                .Prepend(bestBothSwitch)
-                .Prepend(bestProtagonistSwitches), bestElephantSwitches)
-            .Max();
     }
 
     private Dictionary<string, Valve> ParseValves(string input) => input.Split(Environment.NewLine)
@@ -166,8 +41,6 @@ public class Day16 : IAdventSolution
         public int Flow { get; }
         public List<string> Neighbours { get; }
 
-        public bool IsOn;
-
         public Valve(string name, int flow, List<string> neighbours)
         {
             Name = name;
@@ -176,10 +49,6 @@ public class Day16 : IAdventSolution
         }
     }
 
-    /*
-     * Faster approach than above, caching distances first then searching through valves to operate
-     * rather than valves to travel through
-     */
     private class Cave
     {
         readonly Dictionary<string, Valve> _valves;
@@ -273,8 +142,14 @@ public class Day16 : IAdventSolution
             var visited = new HashSet<string> { start };
             var toVisit = new HashSet<string>(_valves.Keys.Where(k => _valves[k].Flow != 0));
             var routes = AllRoutes(start, visited, toVisit, timeLeft, false)
-                .Where(r => r.Count > 1);
-            var scores = routes.Select(r => ScoreRouteWithElephant(r, timeLeft));
+                .Where(r => r.Count > 1).ToList();
+            
+            Console.WriteLine($"found {routes.Count} routes to score");
+
+            // Cutoff is a bit of a guess
+            var topRoutes = routes.Where(r => ScoreRoute(r, timeLeft) > 800).ToList();
+            Console.WriteLine($"found {topRoutes.Count} routes with a good score");
+            var scores = topRoutes.Select(r => ScoreRouteWithElephant(r, timeLeft));
             
             return scores.Max();
         }
